@@ -31,3 +31,7 @@ function snoozeAlarm() {
     ipcRenderer.send('set-alarm', { hour: now.getHours(), minute: now.getMinutes() });
     alert("Alarm 5 dakika ertelendi.");
 }
+
+function hideApp() {
+    ipcRenderer.send('hide-app');
+}

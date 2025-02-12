@@ -3,7 +3,6 @@ const path = require('path');
 
 let mainWindow;
 let tray;
-let alarmTime = null;
 
 app.whenReady().then(() => {
     createMainWindow();
@@ -22,10 +21,9 @@ function createMainWindow() {
 
     mainWindow.loadFile('index.html');
 
-    // Pencere kapatıldığında sadece gizle (arka planda çalışmaya devam etsin)
-    mainWindow.on('close', (event) => {
-        event.preventDefault();
-        mainWindow.hide();
+    // "X" butonuna basınca uygulama tamamen kapansın
+    mainWindow.on('close', () => {
+        app.quit();
     });
 }
 
@@ -43,23 +41,10 @@ function createTray() {
     });
 }
 
-ipcMain.on('set-alarm', (event, alarmData) => {
-    alarmTime = alarmData;
-    console.log(`Alarm kuruldu: ${alarmTime.hour}:${alarmTime.minute}`);
-    checkAlarm();
+ipcMain.on('hide-app', () => {
+    mainWindow.hide();
 });
 
-function checkAlarm() {
-    setInterval(() => {
-        const now = new Date();
-        if (alarmTime && now.getHours() === alarmTime.hour && now.getMinutes() === alarmTime.minute) {
-            showAlarmModal();
-            alarmTime = null;
-        }
-    }, 1000);
-}
-
-function showAlarmModal() {
+ipcMain.on('show-app', () => {
     mainWindow.show();
-    mainWindow.webContents.send('show-alarm');
-}
+});
